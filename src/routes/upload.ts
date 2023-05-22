@@ -20,28 +20,28 @@ export async function uploadRoutes(app: FastifyInstance) {
     }
 
     // mimetype is a global categorization for files type
-    const mimetypeRegex = /^(image|video)\/[a-zA-Z]+/
-    const isValidFileFormat = mimetypeRegex.test(upload.mimetype)
+    const mimeTypeRegex = /^(image|video)\/[a-zA-Z]+/
+    const isValidFileFormat = mimeTypeRegex.test(upload.mimetype)
 
     if (!isValidFileFormat) {
       return reply.status(400).send()
     }
 
-    const filedId = randomUUID()
+    const fileId = randomUUID()
     const extension = extname(upload.filename)
 
-    const filename = filedId.concat(extension)
+    const fileName = fileId.concat(extension)
 
     // createWriteStream to save the file in streaming style
     const writeStream = createWriteStream(
-      resolve(__dirname, '../../uploads', filename),
+      resolve(__dirname, '..', '..', 'uploads', fileName),
     )
 
     // pump awaits for the streaming process to finish
-    await pump(filename, writeStream)
+    await pump(upload.file, writeStream)
 
     const fullUrl = request.protocol.concat('://').concat(request.hostname)
-    const fileUrl = new URL(`/uploads/${filename}`, fullUrl).toString()
+    const fileUrl = new URL(`/uploads/${fileName}`, fullUrl).toString()
 
     return { fileUrl }
   })
